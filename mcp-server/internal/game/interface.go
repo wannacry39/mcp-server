@@ -4,9 +4,7 @@ import "mcp_server/mcp-server/internal/model"
 
 type Game interface {
 	NewGame()
-	MoveUp()
-	MoveDown()
-	MoveLeft()
-	MoveRight()
+	Move(string) error
 	GetState() model.State
+	IsSolved() bool
 }

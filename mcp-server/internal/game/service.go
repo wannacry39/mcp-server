@@ -1,44 +1,63 @@
 package game
 
-import "mcp_server/mcp-server/internal/model"
+import (
+	"math/rand"
+	"mcp_server/mcp-server/internal/model"
+)
 
 type service struct {
 	state model.State
+	moves int
 }
 
-func New() Game {
-	s := &service{}
-	s.NewGame()
-	return s
+func NewGame() Game {
+	g := &service{}
+	g.NewGame()
+	return g
 }
 
-func (s *service) NewGame() {
-	startState := model.NewState()
-	s.state = startState
+func (g *service) NewGame() {
+	g.state = model.NewSolvedState()
+	g.moves = 0
 
+	dirs := []string{"up", "down", "left", "right"}
+
+	for i := 0; i < 100; i++ {
+		_ = g.state.MoveByDirection(dirs[rand.Intn(len(dirs))])
+	}
 }
 
-func (s *service) GetState() model.State {
-	return s.state
+func (g *service) Move(tile string) error {
+	err := g.state.Move(tile)
+	if err != nil {
+		return err
+	}
 
+	g.moves++
+	return nil
 }
 
-func (s *service) MoveUp() {
-	s.state.MoveUp()
-
+func (g *service) GetState() model.State {
+	return g.state.Clone()
 }
 
-func (s *service) MoveDown() {
-	s.state.MoveDown()
+func (g *service) IsSolved() bool {
+	expected := 1
 
-}
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 4; j++ {
 
-func (s *service) MoveLeft() {
-	s.state.MoveLeft()
+			if i == 3 && j == 3 {
+				return g.state.Board[i][j] == 0
+			}
 
-}
+			if g.state.Board[i][j] != expected {
+				return false
+			}
 
-func (s *service) MoveRight() {
-	s.state.MoveRight()
+			expected++
+		}
+	}
 
+	return true
 }
