@@ -16,6 +16,7 @@ func main() {
 		"15-puzzle",
 		"v0.0.1",
 	)
+
 	s.AddTool(mcp.NewTool(
 		"new_game",
 		mcp.WithDescription("Create a new 15 puzzle game with randomly placed puzzles"),
@@ -40,30 +41,12 @@ func main() {
 		mcp.WithDescription("Returns if the game solved or not"),
 	), handler.HandleIsSolved)
 
-	// fmt.Println("Start:")
-	// printBoard(game.GetState())
+	// if err := server.ServeStdio(s); err != nil {
+	// 	panic(err)
+	// }
 
-	// // тестовые ходы
-	// game.Move("left")
-	// game.Move("up")
-
-	// fmt.Println("\nAfter moves:")
-	// printBoard(game.GetState())
-
-	// fmt.Println("\nSolved?", game.IsSolved())
-
-	if err := server.ServeStdio(s); err != nil {
+	httpServer := server.NewSSEServer(s)
+	if err := httpServer.Start(":9999"); err != nil {
 		panic(err)
 	}
-
-	// sseServer := server.NewSSEServer(s, server.WithBaseURL("http://localhost:9999"))
-	// if err := sseServer.Start(":9999"); err != nil {
-	// 	log.Fatal(err)
-	// }
 }
-
-// func printBoard(s model.State) {
-// 	for _, row := range s.Board {
-// 		fmt.Println(row)
-// 	}
-// }
